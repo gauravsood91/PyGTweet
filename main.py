@@ -2,7 +2,7 @@
 from gi.repository import Gtk
 from gi.repository import GdkPixbuf
 import xml.dom.minidom
-import sys
+from twisted.internet import task,reactor
 import tweepy
 import urllib2
 
@@ -12,8 +12,8 @@ cons_secret='g1jCYMlhBZcYlFsg3ecBnCNm5zcrQMbGTBfIycvbRcc'
 #access_token='76611638-TSnLa31lRXEp3qBNpxKmi2gyiW0jCLpOKeEsK5i6A'
 #access_token_secret='wgC9xwGpCMOQQtDazOZF7wtvCA5MrtcaLT6gLv1vdE'
 
-
-config_file=xml.dom.minidom.parse('/home/gaurav/output.xml')
+config_file=xml.dom.minidom.parse('config.xml')
+timeout=300.0
 
 def write_to_file(at,ats):
 	doc=xml.dom.minidom.Document()
@@ -27,7 +27,7 @@ def write_to_file(at,ats):
 	credentials.appendChild(access_token_secret_element)
 	access_token_secret_desc=doc.createTextNode(ats.strip())
 	access_token_secret_element.appendChild(access_token_secret_desc)
-	f=open('/home/gaurav/output.xml','wb')
+	f=open('config.xml','w+')
 	try:
 		f.write(doc.toprettyxml(indent=' '))
 	finally:
@@ -35,7 +35,7 @@ def write_to_file(at,ats):
 
 #Class of the main window
 class MainWindow():
-	def read_from_file(self):
+	def read_from_file(self):	
 		self.status=0
 		self.access_token=config_file.getElementsByTagName('access_token')[0].firstChild.data
 		self.access_token_secret=config_file.getElementsByTagName('access_token_secret')[0].firstChild.data
@@ -125,6 +125,9 @@ class MainWindow():
 		
 			for j in range(0,10):
 				self.user_list[j].set_text(self.users[j])
+			#l=task.LoopingCall(self.refresh())
+			#l.start(timeout)
+			#reactor.run()
 		
 	def test1(self,widget):
 		Gtk.main_quit()
